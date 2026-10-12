@@ -1,0 +1,38 @@
+from logging import debug
+from flask import Flask, render_template, request 
+import utils  
+from utils import preprocessdata 
+from flask_cors import CORS
+
+app = Flask(__name__) 
+CORS(app) 
+
+@app.route('/') 
+def home(): 
+    return render_template('index.html') 
+@app.route('/predict/', methods=['GET', 'POST'])
+
+def predict():  
+    if request.method == 'POST': 
+        Gender = request.form.get('Gender')
+        Married = request.form.get('Married')
+        Dependents = request.form.get('Dependents')
+        Education = request.form.get('Education')
+        Self_Employed = request.form.get('Self_Employed')  
+        ApplicantIncome = request.form.get('ApplicantIncome')  
+        CoapplicantIncome = request.form.get('CoapplicantIncome') 
+        LoanAmount = request.form.get('LoanAmount')   
+        Loan_Amount_Term = request.form.get('Loan_Amount_Term')   
+        Credit_History = request.form.get('Credit_History')   
+        Property_Area = request.form.get('Property_Area')  
+    #preprocess the data before prediction
+    prediction = utils.preprocessdata(Gender, Married, Dependents, Education, Self_Employed, ApplicantIncome,
+       CoapplicantIncome, LoanAmount, Loan_Amount_Term, Credit_History,
+       Property_Area)
+
+    return render_template('predict.html', prediction=prediction) 
+    
+#checks whether the current script is being run as the main program
+if __name__ == '__main__': 
+    app.run(debug=True, port=5001)
+    

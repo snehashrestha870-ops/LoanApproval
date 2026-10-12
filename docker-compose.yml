@@ -1,0 +1,63 @@
+# Loan Approval Prediction System
+# Start:  docker compose up --build
+# Open:   http://localhost:3000
+
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: loanroot
+      MARIADB_DATABASE: loanprediction
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/db-init:/docker-entrypoint-initdb.d:ro   # loads the SQL dump on first start
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      retries: 20
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "127.0.0.1:8081:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  model:
+    build: ./Loan_Prediction
+    ports:
+      - "5001:5001"
+
+  api:
+    build: ./loan_api
+    env_file: ./loan_api/.env        # SECRET_KEY and other settings
+    environment:                     # override the database settings for Docker
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: loanroot
+      DB_DATABASE: loanprediction
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/public/images   # keep uploaded blog images
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./final_Project
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+      - model
+
+volumes:
+  db-data:
+  uploads:

@@ -1,0 +1,4 @@
+node_modules
+.next
+# old unused copy of components/layouts; its imports are broken and fail the production build
+pages/portal/layouts

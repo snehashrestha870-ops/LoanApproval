@@ -1,0 +1,23 @@
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Python environments
+venv/
+.venv/
+.venv-*/
+**/__pycache__/
+*.pyc
+
+# Environment variables
+.env
+.env.*
+
+# macOS and editor files
+.DS_Store
+.vscode/
+
+# Build files
+.next/
+dist/
+build/.git-old/
